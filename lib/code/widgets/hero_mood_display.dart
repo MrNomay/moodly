@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:moodly/code/features/homepage/presentation/provider/mood_provider.dart';
+import 'package:moodly/code/features/homepage/data/models/mood_entry.dart';
+import 'package:moodly/code/features/homepage/presentation/painters/mood_face_painter.dart';
 import 'package:moodly/utils/app_text.dart';
+import 'package:provider/provider.dart';
 
 class HeroMoodDisplay extends StatelessWidget {
   const HeroMoodDisplay({super.key});
 
   @override
   Widget build(BuildContext context) {
-     String? latest;
+    final latest = context.watch<MoodProvider>().latestEntry;
 
-    if (latest == '') {
+    if (latest == null) {
       return _EmptyHero();
     }
 
-    return _FilledHero();
+    return _FilledHero(entry: latest);
   }
 }
 
@@ -51,7 +55,9 @@ class _EmptyHero extends StatelessWidget {
 }
 
 class _FilledHero extends StatelessWidget {
+  final MoodEntry entry;
 
+  const _FilledHero({required this.entry});
 
   @override
   Widget build(BuildContext context) {
@@ -61,21 +67,22 @@ class _FilledHero extends StatelessWidget {
         color: Colors.blueGrey.shade900,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: Colors.indigo,
+          color: entry.mood.colorAccent.withValues(alpha: 0.35),
           width: 1.5,
         ),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.indigo.withValues(alpha: 0.08),
+            entry.mood.colorAccent.withValues(alpha: 0.08),
             Colors.blueGrey.shade900,
           ],
         ),
       ),
       child: Row(
         children: [
-          
+          const SizedBox(width: 32),
+          MoodFace(mood: entry.mood, size: 100),
           const SizedBox(width: 28),
           Expanded(
             child: Column(
@@ -86,14 +93,14 @@ class _FilledHero extends StatelessWidget {
                   'Last logged',
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.indigo.shade200,
+                    color: entry.mood.colorAccent.withValues(alpha: 0.6),
                     letterSpacing: 1.4,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 6),
                 AppText(
-                  'Happy',
+                  entry.mood.label,
                   style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w700,
@@ -103,7 +110,7 @@ class _FilledHero extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 AppText(
-                  'Today, 10:30 AM',
+                  '${entry.shortDate}  ${entry.timeLabel}',
                   style: TextStyle(fontSize: 13, color: Colors.indigo.shade200),
                 ),
               ],
@@ -114,7 +121,7 @@ class _FilledHero extends StatelessWidget {
             height: 80,
             margin: const EdgeInsets.only(right: 24),
             decoration: BoxDecoration(
-              color: Colors.indigo,
+              color: entry.mood.colorAccent,
               borderRadius: BorderRadius.circular(2),
             ),
           ),

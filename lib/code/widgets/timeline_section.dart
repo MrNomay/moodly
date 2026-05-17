@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:moodly/code/features/homepage/presentation/provider/mood_provider.dart';
 import 'package:moodly/code/widgets/timeline_card.dart';
 import 'package:moodly/code/widgets/timeline_empty.dart';
 import 'package:moodly/utils/app_text.dart';
+import 'package:provider/provider.dart';
 
 class TimelineSection extends StatelessWidget {
   const TimelineSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final entries = ['happy', 'sad'];
+    final entries = context.watch<MoodProvider>().timelineEntries;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +55,7 @@ class TimelineSection extends StatelessWidget {
               itemCount: entries.length,
               separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
-                return TimelineCard();
+                return TimelineCard(entry: entries[index]);
               },
             ),
           ),
@@ -61,3 +63,5 @@ class TimelineSection extends StatelessWidget {
     );
   }
 }
+
+
